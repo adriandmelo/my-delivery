@@ -8,7 +8,7 @@ import model.vo.UsuarioVO;
 public class Menu {
 	
 	private static final int OPCAO_MENU_VENDA = 1;
-	private static final int OPCAO_MENU_CADASTRO = 2;
+	private static final int OPCAO_MENU_PRODUTO = 2;
 	private static final int OPCAO_MENU_RELATORIO = 3;
 	private static final int OPCAO_MENU_USUARIO = 4;
 	private static final int OPCAO_MENU_VOLTAR = 9;
@@ -20,15 +20,22 @@ public class Menu {
 		while (opcao != OPCAO_MENU_VOLTAR) {
 			switch (opcao) {
 				case OPCAO_MENU_VENDA: {
-					System.out.println("Acessando o menu de Vendas...");
+					MenuVenda menuVenda = new MenuVenda();
+					menuVenda.apresentarMenuVenda(usuarioVO);
 					break;
 				}
-				case OPCAO_MENU_CADASTRO: {
-					System.out.println("Acessando menu de Cadastro...");
+				case OPCAO_MENU_PRODUTO: {
+					if(usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.FUNCIONARIO) || usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ADMINISTRADOR)) {
+						MenuProduto menuProduto = new MenuProduto();
+						menuProduto.apresentarMenuProduto();
+					}
 					break;
 				}
 				case OPCAO_MENU_RELATORIO: {
-					System.out.println("Acessando o menu de Relatórios...");
+					if(usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.FUNCIONARIO) || usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ADMINISTRADOR)) {
+						MenuRelatorio menuRelatorio = new MenuRelatorio();
+						menuRelatorio.apresentarMenuRelatorio();
+					}
 					break;
 				}
 				case OPCAO_MENU_USUARIO: {
@@ -52,7 +59,7 @@ public class Menu {
 		System.out.println("\nOpções: ");
 		System.out.println(OPCAO_MENU_VENDA + " - Menu de Vendas");
 		if(usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.FUNCIONARIO) || usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ADMINISTRADOR)) {
-			System.out.println(OPCAO_MENU_CADASTRO + " - Menu de Cadastros");
+			System.out.println(OPCAO_MENU_PRODUTO + " - Menu de Produtos");
 			System.out.println(OPCAO_MENU_RELATORIO + " - Menu de Relatórios");
 		}
 		if(usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ADMINISTRADOR)) {

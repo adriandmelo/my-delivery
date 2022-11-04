@@ -131,6 +131,10 @@ public class MenuUsuario {
 			System.out.println("O campo telefone é obrigatório.");
 			resultado = false;
 		}
+		if(usuarioVO.getDataCadastro() == null) {
+			System.out.println("O campo data de cadastro é obrigatório.");
+			resultado = false;
+		}
 		if(usuarioVO.getLogin() == null || usuarioVO.getLogin().isEmpty()) {
 			System.out.println("O campo login é obrigatório.");
 			resultado = false;

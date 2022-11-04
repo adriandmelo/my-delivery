@@ -41,7 +41,7 @@ public class UsuarioBO {
 		UsuarioDAO usuarioDAO = new UsuarioDAO();
 		UsuarioVO usuario = usuarioDAO.consultarUsuarioDAO(usuarioVO);
 		if(usuario == null){
-			System.out.println("\nUsuário não Localizado.");
+			System.out.println("\nUsuário não localizado.");
 		}
 		return usuario;
 	}
