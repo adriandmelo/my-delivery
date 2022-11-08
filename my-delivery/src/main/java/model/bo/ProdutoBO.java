@@ -71,4 +71,13 @@ public class ProdutoBO {
 		return produto;
 	}
 
+	public ArrayList<ProdutoVO> consultarTodosProdutosVigentesBO() {
+		ProdutoDAO produtoDAO = new ProdutoDAO();
+		ArrayList<ProdutoVO> listaProdutosVO = produtoDAO.consultarTodosProdutosVigentesDAO();
+		if(listaProdutosVO.isEmpty()) {
+			System.out.println("\nLista de Produtos está vazia.");
+		}
+		return listaProdutosVO;
+	}
+
 }

@@ -38,4 +38,9 @@ public class ProdutoController {
 		return produtoBO.consultarProdutoBO(produtoVO);
 	}
 
+	public ArrayList<ProdutoVO> consultarTodosProdutosVigentesController() {
+		ProdutoBO produtoBO = new ProdutoBO();
+		return produtoBO.consultarTodosProdutosVigentesBO();
+	}
+
 }
