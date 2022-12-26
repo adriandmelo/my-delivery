@@ -18,7 +18,7 @@ public class EntregaDAO {
 		Statement stmt = Banco.getStatement(conn);
 		boolean retorno = false;
 		
-		String query = "INSERT INTO entrega (idVenda, idEntregador, idSituacaoEntrega) VALUES ("
+		String query = "INSERT INTO entrega (idVenda, idEntregador, situacaoEntrega) VALUES ("
 				+ entregaVO.getIdVenda() + ", "
 				+ entregaVO.getIdEntregador() +", "
 				+ entregaVO.getSituacaoEntrega().getValor() + ")";
@@ -41,10 +41,14 @@ public class EntregaDAO {
 	public boolean atualizarSituacaoEntregaDAO(VendaVO vendaVO) {
 		EntregaVO entregaVO = this.consultarEntregaPorIdVendaDAO(vendaVO.getIdVenda());
 		entregaVO.setSituacaoEntrega(SituacaoEntregaVO.getSituacaoEntregaVOPorValor(entregaVO.getSituacaoEntrega().getValor()+1));
-		if(entregaVO.getSituacaoEntrega().getValor() == SituacaoEntregaVO.values().length) {
+		if(entregaVO.getSituacaoEntrega().getValor() == SituacaoEntregaVO.PEDIDO_ENTREGUE.getValor()) {
 			entregaVO.setDataEntrega(LocalDateTime.now());
 		}
-		return this.atualizarEntregaDAO(entregaVO);
+		boolean retorno = false;
+		if(entregaVO.getSituacaoEntrega().getValor() <= SituacaoEntregaVO.PEDIDO_ENTREGUE.getValor()) {
+			retorno = this.atualizarEntregaDAO(entregaVO);
+		}
+		return retorno;
 	}
 
 	public EntregaVO consultarEntregaPorIdVendaDAO(int idVenda) {
@@ -54,7 +58,7 @@ public class EntregaDAO {
 		EntregaVO entrega = new EntregaVO();
 		String query = "SELECT e.idEntrega, e.idVenda, e.idEntregador, se.descricao, e.dataEntrega "
 				+ "FROM entrega e, situacaoEntrega se "
-				+ "WHERE e.idSituacaoEntrega = se.idSituacaoEntrega "
+				+ "WHERE e.situacaoEntrega = se.ordem "
 				+ "AND e.idVenda = " + idVenda; 
 		try{
 			resultado = stmt.executeQuery(query);
@@ -82,12 +86,11 @@ public class EntregaDAO {
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		boolean retorno = false;
-		String query = "UPDATE entrega SET idSituacaoEntrega = " + entregaVO.getSituacaoEntrega().getValor();
-		if(entregaVO.getDataEntrega() == null) {
-			query += " WHERE idEntrega = " + entregaVO.getIdEntrega();
-		} else {
-			query += ", dataEntrega = '" + entregaVO.getDataEntrega() + "' WHERE idEntrega = " + entregaVO.getIdEntrega();
+		String query = "UPDATE entrega SET situacaoEntrega = " + entregaVO.getSituacaoEntrega().getValor();
+		if(entregaVO.getDataEntrega() != null) {
+			query += ", dataEntrega = '" + entregaVO.getDataEntrega() + "' ";
 		}
+		query += " WHERE idEntrega = " + entregaVO.getIdEntrega();
 		try {
 			if(stmt.executeUpdate(query) == 1) {
 				retorno = true;
@@ -102,13 +105,13 @@ public class EntregaDAO {
 		return retorno;
 	}
 
-	public boolean cancelarEntregaDAO(int idVenda) {
+	public boolean cancelarEntregaDAO(VendaVO vendaVO, int situacao) {
 		Connection conn = Banco.getConnection();
 		Statement stmt = Banco.getStatement(conn);
 		boolean retorno = false;
-		String query = "UPDATE entrega SET idSituacaoEntrega = " + SituacaoEntregaVO.ENTREGA_CANCELADA.getValor() + ", "
-				+ "dataEntrega = '" + LocalDateTime.now()
-				+ "' WHERE idVenda = " + idVenda;
+		String query = "UPDATE entrega SET situacaoEntrega = " + situacao + ", "
+				+ "dataEntrega = '" + vendaVO.getDataCancelamento()
+				+ "' WHERE idVenda = " + vendaVO.getIdVenda();
 		try {
 			if(stmt.executeUpdate(query) == 1) {
 				retorno = true;

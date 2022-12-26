@@ -47,18 +47,22 @@ public class VendaBO {
 		return vendaVO;
 	}
 
+	//Verificar se a venda existe na base de dados.
+	//Verificar se a venda já está cancelada na base de dados.
+	//Verificar se a data de cancelamento é posterior a dada de venda.
+	//Se houver entrega verificar se a entrega já foi realizada ou se esta em rota de entrega.
 	public boolean cancelarVendaBO(VendaVO vendaVO) {
 		boolean retorno = false;
 		EntregaDAO entregaDAO = new EntregaDAO();
 		VendaDAO vendaDAO = new VendaDAO();
-		VendaVO vendaBanco = vendaDAO.consultarVendaDAO(vendaVO);
-		if(vendaBanco != null) {
-			if(vendaBanco.getDataCancelamento() == null) {
-				if(vendaBanco.getDataVenda().isBefore(vendaVO.getDataCancelamento())) {
-					if(vendaBanco.isFlagEntrega()) {
+		VendaVO venda = vendaDAO.consultarVendaDAO(vendaVO);
+		if(venda != null) {
+			if(venda.getDataCancelamento() == null) {
+				if(venda.getDataVenda().isBefore(vendaVO.getDataCancelamento())) {
+					if(venda.isFlagEntrega()) {
 						EntregaVO entregaVO = entregaDAO.consultarEntregaPorIdVendaDAO(vendaVO.getIdVenda());
 						if(entregaVO.getSituacaoEntrega().getValor() <= SituacaoEntregaVO.PREPARANDO_PEDIDO.getValor()) {
-							boolean resultado = entregaDAO.cancelarEntregaDAO(vendaVO.getIdVenda());
+							boolean resultado = entregaDAO.cancelarEntregaDAO(vendaVO, SituacaoEntregaVO.PEDIDO_CANCELADO.getValor());
 							if(resultado) {
 								retorno = vendaDAO.cancelarVendaDAO(vendaVO);
 							} else {
@@ -82,6 +86,10 @@ public class VendaBO {
 		return retorno;
 	}
 
+	//Verificar se a venda existe na base de dados.
+	//Verificar se a venda possui entrega.
+	//Verificar se a venda não foi cancelada.
+	//Verificar se a venda já foi entregue.
 	public boolean verificarVendaParaAtualizarSituacaoEntrega(VendaVO vendaVO) {
 		VendaDAO vendaDAO = new VendaDAO();
 		EntregaDAO entregaDAO = new EntregaDAO();
@@ -92,7 +100,7 @@ public class VendaBO {
 					if(entregaDAO.consultarEntregaPorIdVendaDAO(vendaVO.getIdVenda()).getDataEntrega() == null) {
 						retorno = true;
 					} else {
-						System.out.println("\nVenda já teve a entrega realizada.");
+						System.out.println("\nVenda já teve a entrega realizada ou cancelada.");
 					}
 				} else {
 					System.out.println("\nVenda já se encontra cancelada na base da dados.");

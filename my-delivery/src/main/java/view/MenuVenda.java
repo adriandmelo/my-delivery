@@ -18,10 +18,12 @@ public class MenuVenda {
 	
 	private static final int OPCAO_MENU_CADASTRAR_VENDA = 1;
 	private static final int OPCAO_MENU_CANCELAR_VENDA = 2;
-	private static final int OPCAO_MENU_SITUACAO_ENTREGA = 3;
+	private static final int OPCAO_MENU_CANCELAR_ENTREGA = 3;
+	private static final int OPCAO_MENU_SITUACAO_ENTREGA = 4;
 	private static final int OPCAO_MENU_VENDA_VOLTAR = 9;
 	
 	private static int NUMERO_PEDIDO = 0;
+	private static double PERCENTUAL = 0.05;
 	
 	Scanner teclado = new Scanner(System.in);
 
@@ -38,6 +40,12 @@ public class MenuVenda {
 				case OPCAO_MENU_CANCELAR_VENDA: {
 					if(!usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ENTREGADOR)) {
 						this.cancelarVenda();
+					}
+					break;
+				}
+				case OPCAO_MENU_CANCELAR_ENTREGA: {
+					if(!usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ENTREGADOR)) {
+						this.cancelarEntrega();
 					}
 					break;
 				}
@@ -62,6 +70,7 @@ public class MenuVenda {
 		if(!usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.ENTREGADOR)) {
 			System.out.println(OPCAO_MENU_CADASTRAR_VENDA + " - Cadastrar Venda");
 			System.out.println(OPCAO_MENU_CANCELAR_VENDA + " - Cancelar Venda");
+			System.out.println(OPCAO_MENU_CANCELAR_ENTREGA + " - Cancelar Entrega");
 		}
 		if(!usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.CLIENTE)) {
 			System.out.println(OPCAO_MENU_SITUACAO_ENTREGA + " - Situação da Entrega");
@@ -77,7 +86,7 @@ public class MenuVenda {
 		if(usuarioVO.getTipoUsuario().equals(TipoUsuarioVO.CLIENTE)) {
 			vendaVO.setIdUsuario(usuarioVO.getIdUsuario());
 		} else {
-			System.out.print("Informe o código do usuário: ");
+			System.out.print("Informe o código do cliente: ");
 			vendaVO.setIdUsuario(Integer.parseInt(teclado.nextLine()));
 		}
 		vendaVO.setNumeroPedido(this.gerarNumeroPedido());
@@ -97,7 +106,7 @@ public class MenuVenda {
 		System.out.print("Pedido é para Entregar [S - N]: ");
 		String opcaoEntrega = teclado.nextLine();
 		if(opcaoEntrega.toUpperCase().equals("S") || opcaoEntrega.toUpperCase().equals("N")) {
-			double taxaEntrega = subTotal * 0.05;
+			double taxaEntrega = subTotal * PERCENTUAL;
 			double totalConta = subTotal;
 			if(opcaoEntrega.toUpperCase().equals("S")) {
 				vendaVO.setFlagEntrega(true);
@@ -187,6 +196,27 @@ public class MenuVenda {
 				System.out.println("Não foi possível cancelar a venda.");
 			}
 		}
+	}
+	
+	private void cancelarEntrega() {
+		VendaVO vendaVO = new VendaVO();
+		System.out.print("\nInforme o código da venda: ");
+		vendaVO.setIdVenda(Integer.parseInt(teclado.nextLine()));
+		System.out.print("Digite a data do cancelamento no formato dd/MM/yyyy HH:mm:ss: ");
+		vendaVO.setDataCancelamento(LocalDateTime.parse(teclado.nextLine(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+		
+		if(vendaVO.getIdVenda() == 0 || vendaVO.getDataCancelamento() == null) {
+			System.out.println("Os campos código da venda e data de cancelamento são obrigatórios.");
+		} else {
+			EntregaController entregaController = new EntregaController();
+			boolean resultado = entregaController.cancelarEntregaController(vendaVO);
+			if(resultado) {
+				System.out.println("\nEntrega cancelada com Sucesso.");
+			} else {
+				System.out.println("Não foi possível cancelar a entrega.");
+			}
+		}
+		
 	}
 	
 	private void atualizarSituacaoEntrega() {

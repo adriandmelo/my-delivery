@@ -10,4 +10,9 @@ public class EntregaController {
 		return entregaBO.atualizarSituacaoEntregaBO(vendaVO);
 	}
 
+	public boolean cancelarEntregaController(VendaVO vendaVO) {
+		EntregaBO entregaBO = new EntregaBO();
+		return entregaBO.cancelarEntregaBO(vendaVO);
+	}
+
 }

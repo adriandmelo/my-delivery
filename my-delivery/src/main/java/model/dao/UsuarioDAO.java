@@ -143,7 +143,7 @@ public class UsuarioDAO {
 				usuarioVO.setNome(resultado.getString(3));
 				usuarioVO.setCpf(resultado.getString(4));
 				usuarioVO.setEmail(resultado.getString(5));
-				usuarioVO.setTelefone(resultado.getString(6));
+				usuarioVO.setTelefone(resultado.getString(6)); 
 				usuarioVO.setDataCadastro(LocalDateTime.parse(resultado.getString(7), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")));
 				if(resultado.getString(8) != null) {
 					usuarioVO.setDataExpiracao(LocalDateTime.parse(resultado.getString(8), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")));
@@ -300,9 +300,10 @@ public class UsuarioDAO {
 		ResultSet resultado = null;
 		ArrayList<UsuarioVO> listaUsuariosVO = new ArrayList<UsuarioVO>();
 		String query = "SELECT u.idUsuario, tipo.descricao, u.nome, u.cpf, u.email, u.telefone, u.dataCadastro, "
-				+ "u.dataExpiracao, u.login, u.senha "
+				+ "u.login, u.senha "
 				+ "FROM usuario u, tipoUsuario tipo "
 				+ "WHERE u.idTipoUsuario = tipo.idTipoUsuario "
+				+ "AND u.dataExpiracao is NULL "
 				+ "AND tipo.descricao like '" + TipoUsuarioVO.ENTREGADOR.toString() + "'";
 		try{
 			resultado = stmt.executeQuery(query);
@@ -315,11 +316,8 @@ public class UsuarioDAO {
 				usuarioVO.setEmail(resultado.getString(5));
 				usuarioVO.setTelefone(resultado.getString(6));
 				usuarioVO.setDataCadastro(LocalDateTime.parse(resultado.getString(7), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")));
-				if(resultado.getString(8) != null) {
-					usuarioVO.setDataExpiracao(LocalDateTime.parse(resultado.getString(8), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")));
-				}
-				usuarioVO.setLogin(resultado.getString(9));
-				usuarioVO.setSenha(resultado.getString(10));
+				usuarioVO.setLogin(resultado.getString(8));
+				usuarioVO.setSenha(resultado.getString(9));
 				listaUsuariosVO.add(usuarioVO);
 			}
 		} catch (SQLException e){
